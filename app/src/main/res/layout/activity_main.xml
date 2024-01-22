@@ -118,14 +118,14 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:ems="14"
-                android:inputType="textPersonName"
                 android:hint="Name"
+                android:imeOptions="actionNext"
+                android:inputType="textPersonName"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textContact"
-                android:imeOptions="actionNext"
                 tools:ignore="HardcodedText" />
 
-                <requestFocus />
+            <requestFocus />
 
             <TextView
                 android:id="@+id/textAddress"
@@ -145,11 +145,11 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:ems="16"
+                android:hint="Enter Street Address:"
+                android:imeOptions="actionNext"
                 android:inputType="textPersonName"
-                android:hint="Enter Street Address"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textAddress"
-                android:imeOptions="actionNext"
                 tools:ignore="HardcodedText" />
 
             <EditText
@@ -167,17 +167,16 @@
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/editAddress"
-                tools:ignore="HardcodedText"
-                />
+                tools:ignore="HardcodedText" />
 
             <EditText
                 android:id="@+id/editState"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="2dp"
                 android:layout_marginStart="2dp"
+                android:layout_marginLeft="2dp"
                 android:layout_marginTop="8dp"
-                android:ems="2"
+                android:ems="3"
                 android:hint="State:"
                 android:imeOptions="actionNext"
                 android:inputType="textCapCharacters"
@@ -189,16 +188,63 @@
                 android:id="@+id/editZipcode"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="2dp"
                 android:layout_marginStart="2dp"
+                android:layout_marginLeft="2dp"
                 android:layout_marginTop="8dp"
                 android:ems="5"
                 android:hint="Zipcode:"
-                android:inputType="number"
                 android:imeOptions="actionNext"
+                android:inputType="number"
                 android:nextFocusDown="@id/editHome"
                 app:layout_constraintStart_toEndOf="@+id/editState"
-                app:layout_constraintTop_toBottomOf="@+id/editAddress"/>
+                app:layout_constraintTop_toBottomOf="@+id/editAddress" />
+
+            <TextView
+                android:id="@+id/textHome"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="16dp"
+                android:text="Home Phone:"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/editCity" />
+
+            <EditText
+                android:id="@+id/editHome"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:ems="8"
+                android:imeOptions="actionNext"
+                android:inputType="phone"
+                android:maxLength="14"
+                android:nextFocusDown="@id/editCell"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textHome" />
+
+            <TextView
+                android:id="@+id/textCell"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="16dp"
+                android:text="Cell Phone:"
+                app:layout_constraintStart_toEndOf="@id/editHome"
+                app:layout_constraintTop_toBottomOf="@id/editCity" />
+
+            <EditText
+                android:id="@+id/editCell"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="8"
+                android:imeOptions="actionNext"
+                android:inputType="phone"
+                android:maxLength="14"
+                android:nextFocusDown="@id/editEMail"
+                app:layout_constraintStart_toStartOf="@+id/textCell"
+                tools:layout_editor_absoluteX="184dp"
+                tools:layout_editor_absoluteY="273dp" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
