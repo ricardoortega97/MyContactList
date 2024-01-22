@@ -2,10 +2,12 @@ package com.example.mycontactlist;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ToggleButton;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -14,6 +16,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         intiListButton();
+        intiMapButton();
+        intiSettingsButton();
     }
     private void intiListButton(){
         ImageButton ibList = findViewById(R.id.contactsButton);
@@ -31,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         ImageButton ibList = findViewById(R.id.mapButton);
         ibList.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this,ContactListActivity.class);//change this to maps
+                Intent intent = new Intent(MainActivity.this,ContactMapActivity.class);//change this to maps
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivities(intent);
             }
@@ -43,12 +47,22 @@ public class MainActivity extends AppCompatActivity {
         ImageButton ibList = findViewById(R.id.settingsButton);
         ibList.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this,ContactListActivity.class);//change this to settings
+                Intent intent = new Intent(MainActivity.this,ContactSettingsActivity.class);//change this to settings
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivities(intent);
             }
             private void startActivities(Intent intent) {
             }
         });
+    }
+
+    private void intiToggleButton(){
+        final ToggleButton editToggle = (ToggleButton) findViewById(R.id.toggleButton);
+        editToggle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setForEditing(editToggle.isChecked())
+            }
+        })
     }
 }
