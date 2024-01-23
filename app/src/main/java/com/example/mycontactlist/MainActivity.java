@@ -102,7 +102,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     @Override
     public void didFinishDatePickerDialog(Calendar selectedTime) {
         TextView birthDate = findViewById(R.id.textBirthday);
-        birthDate.setText(DateFormat.format("MM/DD/YYYY", selectedTime));
+        birthDate.setText(DateFormat.format("MM/dd/yyyy", selectedTime));
+        //MM/DD/YYYY will not display correctly
     }
     private void intiChangeDateButton(){
         Button changeDate = findViewById(R.id.btnBirthday);

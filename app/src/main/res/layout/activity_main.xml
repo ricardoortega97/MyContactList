@@ -289,7 +289,7 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="24dp"
-                android:hint="MM/DD/YYYY"
+                android:text="01/01/1970"
                 app:layout_constraintTop_toBottomOf="@id/editEMail"
                 app:layout_constraintStart_toEndOf="@id/textBday"
                 tools:layout_editor_absoluteX="78dp"
