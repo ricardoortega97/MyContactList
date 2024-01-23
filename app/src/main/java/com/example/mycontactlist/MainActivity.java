@@ -11,7 +11,9 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ToggleButton;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.Calendar;
+
+public class MainActivity extends AppCompatActivity implements DatePickerDialog.SaveDateListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,7 +24,6 @@ public class MainActivity extends AppCompatActivity {
         intiSettingsButton();
         intiToggleButton();
         setForEditing(false);
-
     }
     private void intiListButton(){
         ImageButton ibList = findViewById(R.id.contactsButton);
@@ -96,6 +97,9 @@ public class MainActivity extends AppCompatActivity {
         if (enabled){
             editName.requestFocus();
         }
+    }
+    @Override
+    public void didFinishDatePickerDialog(Calendar selectedTime) {
 
     }
 }
