@@ -1,16 +1,16 @@
 package com.example.mycontactlist;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.DialogInterface;
+import androidx.fragment.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.ToggleButton;
-
+import android.text.format.DateFormat;
 import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity implements DatePickerDialog.SaveDateListener {
@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         intiSettingsButton();
         intiToggleButton();
         setForEditing(false);
+        intiChangeDateButton();
     }
     private void intiListButton(){
         ImageButton ibList = findViewById(R.id.contactsButton);
@@ -100,6 +101,18 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     }
     @Override
     public void didFinishDatePickerDialog(Calendar selectedTime) {
-
+        TextView birthDate = findViewById(R.id.textBirthday);
+        birthDate.setText(DateFormat.format("MM/DD/YYYY", selectedTime));
+    }
+    private void intiChangeDateButton(){
+        Button changeDate = findViewById(R.id.btnBirthday);
+        changeDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fm = getSupportFragmentManager();
+                DatePickerDialog datePickerDialog = new DatePickerDialog();
+                datePickerDialog.show(fm, "DatePick");
+            }
+        });
     }
 }
