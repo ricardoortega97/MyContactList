@@ -32,9 +32,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this,ContactListActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivities(intent);
-            }
-            private void startActivities(Intent intent) {
+                startActivities(new Intent[]{intent});
             }
         });
     }
@@ -44,9 +42,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this,ContactMapActivity.class);//change this to maps
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivities(intent);
-            }
-            private void startActivities(Intent intent) {
+                startActivities(new Intent[]{intent});
             }
         });
     }
@@ -56,9 +52,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this,ContactSettingsActivity.class);//change this to settings
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivities(intent);
-            }
-            private void startActivities(Intent intent) {
+                startActivities(new Intent[]{intent});
             }
         });
     }
