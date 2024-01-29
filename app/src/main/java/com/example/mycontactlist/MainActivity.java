@@ -2,15 +2,19 @@ package com.example.mycontactlist;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
+
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 import android.text.format.DateFormat;
@@ -30,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         setForEditing(false);
         intiChangeDateButton();
         initTextChangedEvents();
+        initSaveButton();
         currentContact = new Contact();
     }
     private void intiListButton(){
@@ -94,9 +99,13 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         editEmail.setEnabled(enabled);
         buttonChange.setEnabled(enabled);
         buttonSave.setEnabled(enabled);
-
+        //When user saves data, this will focus the screen to the top when clicked saved
         if (enabled){
             editName.requestFocus();
+        }
+        else{
+            ScrollView s = findViewById(R.id.scrollViiew);
+            s.fullScroll(ScrollView.FOCUS_UP);
         }
     }
     @Override
@@ -243,6 +252,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             @Override
             public void onClick(View v) {
                 boolean wasSuccessful;
+                hideKeyboard();
                 ContactDataSource ds = new ContactDataSource(MainActivity.this);
                 try {
                     ds.open();
@@ -264,5 +274,25 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 }
             }
         });
+    }
+    private void hideKeyboard(){
+        InputMethodManager imm = (InputMethodManager)
+                getSystemService(Context.INPUT_METHOD_SERVICE);
+        EditText editName = findViewById(R.id.editName);
+        imm.hideSoftInputFromWindow(editName.getWindowToken(), 0);
+        EditText editAddress = findViewById(R.id.editAddress);
+        imm.hideSoftInputFromWindow(editAddress.getWindowToken(), 0 );
+        EditText editCity = findViewById(R.id.editCity);
+        imm.hideSoftInputFromWindow(editCity.getWindowToken(), 0);
+        EditText editState = findViewById(R.id.editState);
+        imm.hideSoftInputFromWindow(editState.getWindowToken(), 0 );
+        EditText editZipcode = findViewById(R.id.editZipcode);
+        imm.hideSoftInputFromWindow(editZipcode.getWindowToken(), 0);
+        EditText editPhone = findViewById(R.id.editPhone);
+        imm.hideSoftInputFromWindow(editPhone.getWindowToken(), 0 );
+        EditText editCell = findViewById(R.id.editCell);
+        imm.hideSoftInputFromWindow(editCell.getWindowToken(), 0);
+        EditText editEmail = findViewById(R.id.editEMail);
+        imm.hideSoftInputFromWindow(editEmail.getWindowToken(), 0 );
     }
 }

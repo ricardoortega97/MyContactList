@@ -7,15 +7,15 @@
     tools:context=".ContactListActivity">
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="0dp"
-        android:layout_height="90dp"
+        android:layout_height="100dp"
+        android:background="@color/navBar_background"
         android:orientation="horizontal"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0">
+        app:layout_constraintStart_toStartOf="parent">
 
         <ImageButton
             android:id="@+id/contactsButton"
@@ -25,7 +25,8 @@
             android:backgroundTint="@color/white"
             android:contentDescription="@string/contactsRes"
             android:scaleType="fitCenter"
-            app:srcCompat="@drawable/contacts" />
+            app:srcCompat="@drawable/contacts"
+            tools:ignore="RedundantDescriptionCheck" />
 
         <ImageButton
             android:id="@+id/mapButton"
@@ -35,7 +36,8 @@
             android:backgroundTint="@color/white"
             android:contentDescription="@string/mapRes"
             android:scaleType="fitCenter"
-            app:srcCompat="@drawable/map" />
+            app:srcCompat="@drawable/map"
+            tools:ignore="RedundantDescriptionCheck" />
 
         <ImageButton
             android:id="@+id/settingsButton"
@@ -45,7 +47,8 @@
             android:backgroundTint="@color/white"
             android:contentDescription="@string/settingsRes"
             android:scaleType="fitCenter"
-            app:srcCompat="@drawable/settings" />
+            app:srcCompat="@drawable/settings"
+            tools:ignore="RedundantDescriptionCheck" />
     </LinearLayout>
 
 
