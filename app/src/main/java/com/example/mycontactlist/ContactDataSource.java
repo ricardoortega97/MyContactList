@@ -26,7 +26,7 @@ public class ContactDataSource {
             ContentValues initialValues = new ContentValues();
 
             initialValues.put("contactname", c.getContactName());
-            initialValues.put("streeaddress", c.getStreetAddress());
+            initialValues.put("streetaddress", c.getStreetAddress());
             initialValues.put("city", c.getCity());
             initialValues.put("state", c.getState());
             initialValues.put("zipcode", c.getZipcode());
