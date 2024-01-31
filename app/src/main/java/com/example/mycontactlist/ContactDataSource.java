@@ -48,7 +48,7 @@ public class ContactDataSource {
             ContentValues updateValues = new ContentValues();
 
             updateValues.put("contactname", c.getContactName());
-            updateValues.put("streeaddress", c.getStreetAddress());
+            updateValues.put("streetaddress", c.getStreetAddress());
             updateValues.put("city", c.getCity());
             updateValues.put("state", c.getState());
             updateValues.put("zipcode", c.getZipcode());
