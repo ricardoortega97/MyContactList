@@ -11,6 +11,7 @@ import java.util.ArrayList;
 public class ContactAdapter extends RecyclerView.Adapter  {
     private ArrayList<String> contactData;
 //Sets a code behavior of the viewHolder
+    private View.OnClickListener mOnItemClickerListener;
     public class ContactViewHolder extends RecyclerView.ViewHolder {
 
         public TextView textViewContact;
@@ -18,6 +19,8 @@ public class ContactAdapter extends RecyclerView.Adapter  {
         public ContactViewHolder(@NonNull View itemView) {//cannot return a null value
             super(itemView);
             textViewContact = itemView.findViewById(R.id.textViewName);
+            itemView.setTag(this);
+            itemView.setOnClickListener(mOnItemClickerListener);
         }
         //Decalres a method to return the TextView layout
         public TextView getContactTextView() {
@@ -26,6 +29,9 @@ public class ContactAdapter extends RecyclerView.Adapter  {
     }//constructor method to decalre the adapter and associate data to be displayed
     public ContactAdapter(ArrayList<String> arrayList) {
         contactData = arrayList;
+    }
+    public  void setOnItemClickerListener(View.OnClickListener itemClickListener) {
+        mOnItemClickerListener = itemClickListener;
     }
     @NonNull
     @Override

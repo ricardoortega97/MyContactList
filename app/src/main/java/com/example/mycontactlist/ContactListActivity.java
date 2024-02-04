@@ -14,6 +14,16 @@ import java.util.ArrayList;
 
 public class ContactListActivity extends AppCompatActivity {
 
+    private View.OnClickListener onItemClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            RecyclerView.ViewHolder viewHolder = (RecyclerView.ViewHolder) v.getTag();
+            int position = viewHolder.getAdapterPosition();
+            Intent intent = new Intent(ContactListActivity.this, MainActivity.class);
+            startActivities(new Intent[]{intent});
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
