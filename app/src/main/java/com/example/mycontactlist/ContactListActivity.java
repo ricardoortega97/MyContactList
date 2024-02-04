@@ -1,11 +1,16 @@
 package com.example.mycontactlist;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.Toast;
+
+import java.util.ArrayList;
 
 public class ContactListActivity extends AppCompatActivity {
 
@@ -16,6 +21,25 @@ public class ContactListActivity extends AppCompatActivity {
         intiListButton();
         intiMapButton();
         intiSettingsButton();
+        //List activation
+        ContactDataSource ds = new ContactDataSource(this);
+        ArrayList<String> names;
+
+        try {
+            ds.open();
+            names = ds.getContactName();
+            ds.close();
+            RecyclerView contactList = findViewById(R.id.rvContacts);
+            //creates an instance of layoutManager to display a scolling list
+            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+            //message displays in the current activity
+            contactList.setLayoutManager(layoutManager);
+            ContactAdapter contactAdapter = new ContactAdapter(names);
+            contactList.setAdapter(contactAdapter);
+        }
+        catch (Exception e) {
+            Toast.makeText(this, "Error retrieving contacts ", Toast.LENGTH_LONG).show();
+        }
     }
 
     private void intiListButton(){
@@ -48,4 +72,6 @@ public class ContactListActivity extends AppCompatActivity {
             }
         });
     }
+
+
 }
