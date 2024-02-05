@@ -298,4 +298,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         EditText editEmail = findViewById(R.id.editEMail);
         imm.hideSoftInputFromWindow(editEmail.getWindowToken(), 0 );
     }
+
+
+
 }

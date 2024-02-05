@@ -3,24 +3,26 @@ package com.example.mycontactlist;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
-
 import java.util.ArrayList;
 
 public class ContactListActivity extends AppCompatActivity {
+
+    ArrayList<Contact> contacts;
 
     private View.OnClickListener onItemClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             RecyclerView.ViewHolder viewHolder = (RecyclerView.ViewHolder) v.getTag();
             int position = viewHolder.getAdapterPosition();
+            int contactID = contacts.get(position).getContactID();
             Intent intent = new Intent(ContactListActivity.this, MainActivity.class);
-            startActivities(new Intent[]{intent});
+            intent.putExtra("contactID", contactID);
+            startActivity(intent);
         }
     };
 
@@ -33,24 +35,27 @@ public class ContactListActivity extends AppCompatActivity {
         intiSettingsButton();
         //List activation
         ContactDataSource ds = new ContactDataSource(this);
-        ArrayList<String> names;
+
+
 
         try {
             ds.open();
-            names = ds.getContactName();
+            contacts = ds.getContacts();
             ds.close();
             RecyclerView contactList = findViewById(R.id.rvContacts);
-            //creates an instance of layoutManager to display a scolling list
+            //creates an instance of layoutManager to display a scrolling list
             RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
             //message displays in the current activity
             contactList.setLayoutManager(layoutManager);
-            ContactAdapter contactAdapter = new ContactAdapter(names);
+            ContactAdapter contactAdapter = new ContactAdapter(contacts);
             contactList.setAdapter(contactAdapter);
         }
         catch (Exception e) {
             Toast.makeText(this, "Error retrieving contacts ", Toast.LENGTH_LONG).show();
         }
+
     }
+
 
     private void intiListButton(){
         ImageButton ibList = findViewById(R.id.contactsButton);
