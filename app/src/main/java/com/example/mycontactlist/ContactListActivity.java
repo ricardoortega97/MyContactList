@@ -3,16 +3,21 @@ package com.example.mycontactlist;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
+import android.widget.Switch;
 import android.widget.Toast;
 import java.util.ArrayList;
 
 public class ContactListActivity extends AppCompatActivity {
 
-    ArrayList<Contact> contacts;
+   private ArrayList<Contact> contacts;
 
     private View.OnClickListener onItemClickListener = new View.OnClickListener() {
         @Override
@@ -33,29 +38,41 @@ public class ContactListActivity extends AppCompatActivity {
         intiListButton();
         intiMapButton();
         intiSettingsButton();
+        initAddContactButton();
+        initDeleteSwitch();
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        String sortBy = getSharedPreferences("MyContactListPreferences",
+                Context.MODE_PRIVATE).getString("sortfield", "contactname");
+        String sortOrder = getSharedPreferences("MyContactListPreferences",
+                Context.MODE_PRIVATE).getString("sortOrder", "ASC");
         //List activation
         ContactDataSource ds = new ContactDataSource(this);
-
-
-
         try {
             ds.open();
-            contacts = ds.getContacts();
+            contacts = ds.getContacts(sortBy, sortOrder);
             ds.close();
-            RecyclerView contactList = findViewById(R.id.rvContacts);
-            //creates an instance of layoutManager to display a scrolling list
-            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-            //message displays in the current activity
-            contactList.setLayoutManager(layoutManager);
-            ContactAdapter contactAdapter = new ContactAdapter(contacts);
-            contactList.setAdapter(contactAdapter);
+            //if there is no saved contacts in startup, then it will use intent to the mainActivity
+            if (contacts.size() > 0) {
+                RecyclerView contactList = findViewById(R.id.rvContacts);
+                //creates an instance of layoutManager to display a scrolling list
+                RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+                //message displays in the current activity
+                contactList.setLayoutManager(layoutManager);
+                ContactAdapter contactAdapter = new ContactAdapter(contacts, null);
+                contactList.setAdapter(contactAdapter);
+            } else {
+                Intent intent = new Intent(ContactListActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+
         }
         catch (Exception e) {
             Toast.makeText(this, "Error retrieving contacts ", Toast.LENGTH_LONG).show();
         }
-
     }
-
 
     private void intiListButton(){
         ImageButton ibList = findViewById(R.id.contactsButton);
@@ -88,5 +105,26 @@ public class ContactListActivity extends AppCompatActivity {
         });
     }
 
-
+    private void initAddContactButton() {
+        Button newContact = findViewById(R.id.buttonAddContact);
+        newContact.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ContactListActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+    private void initDeleteSwitch() {
+        Switch s = findViewById(R.id.switchDelete);
+        s.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                boolean status = buttonView.isChecked();
+                ContactAdapter contactAdapter = null;
+                contactAdapter.setDelete(status);
+                contactAdapter.notifyDataSetChanged();
+            }
+        });
+    }
 }
