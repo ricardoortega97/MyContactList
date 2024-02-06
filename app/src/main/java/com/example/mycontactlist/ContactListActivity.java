@@ -3,7 +3,6 @@ package com.example.mycontactlist;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -119,11 +118,11 @@ public class ContactListActivity extends AppCompatActivity {
         Switch s = findViewById(R.id.switchDelete);
         s.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                boolean status = buttonView.isChecked();
-                ContactAdapter contactAdapter = null;
-                contactAdapter.setDelete(status);
-                contactAdapter.notifyDataSetChanged();
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                Boolean status = compoundButton.isChecked();
+                ContactAdapter.setDelete(status);
+                ContactAdapter.noitfyDataSetChanged();
+
             }
         });
     }

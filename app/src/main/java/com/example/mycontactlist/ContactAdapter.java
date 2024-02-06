@@ -21,13 +21,16 @@ public class ContactAdapter extends RecyclerView.Adapter {
     private ArrayList<Contact> contactData;
 //Sets a code behavior of the viewHolder
     private View.OnClickListener mOnItemClickerListener;
-    private boolean isDeleting;
+    private static boolean isDeleting;
     private Context parentContext;
 
     //constructor method to decalre the adapter and associate data to be displayed
     public ContactAdapter(ArrayList<Contact> arrayList, Context context) {
         contactData = arrayList;
         parentContext = context;
+    }
+
+    public static void noitfyDataSetChanged() {
     }
 
 
@@ -59,8 +62,8 @@ public class ContactAdapter extends RecyclerView.Adapter {
         }
     }
 
-    public  void setOnItemClickerListener(View.OnClickListener itemClickListener) {
-        mOnItemClickerListener = itemClickListener;
+    public void setmOnItemClickerListener(View.OnClickListener itemClickerListener) {
+        mOnItemClickerListener = itemClickerListener;
     }
     @NonNull
     @Override
@@ -85,16 +88,17 @@ public class ContactAdapter extends RecyclerView.Adapter {
             });
             }
         else {
-               cvh.getDeleteButton().setVisibility(View.INVISIBLE);
+           cvh.getDeleteButton().setVisibility(View.INVISIBLE);
         }
     }
     @Override
     public int getItemCount() {
         return contactData.size();
     }
-    public void setDelete(boolean b) {
+    static void setDelete(boolean b) {
         isDeleting = b;
     }
+
     private void deleteItem(int position) {
         Contact contact = contactData.get(position);
         ContactDataSource ds = new ContactDataSource(parentContext);
