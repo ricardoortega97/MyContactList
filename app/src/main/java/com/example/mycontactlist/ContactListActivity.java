@@ -1,6 +1,7 @@
 package com.example.mycontactlist;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.content.Context;
@@ -34,11 +35,11 @@ public class ContactListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact_list);
+        initAddContactButton();
+        initDeleteSwitch();
         intiListButton();
         intiMapButton();
         intiSettingsButton();
-        initAddContactButton();
-        initDeleteSwitch();
     }
     @Override
     public void onResume() {
@@ -60,7 +61,7 @@ public class ContactListActivity extends AppCompatActivity {
                 RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
                 //message displays in the current activity
                 contactList.setLayoutManager(layoutManager);
-                ContactAdapter contactAdapter = new ContactAdapter(contacts, null);
+                ContactAdapter contactAdapter = new ContactAdapter(contacts,  ContactListActivity.this);
                 contactList.setAdapter(contactAdapter);
             } else {
                 Intent intent = new Intent(ContactListActivity.this, MainActivity.class);
@@ -118,12 +119,13 @@ public class ContactListActivity extends AppCompatActivity {
         Switch s = findViewById(R.id.switchDelete);
         s.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                Boolean status = compoundButton.isChecked();
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                boolean status = compoundButton.isChecked();
                 ContactAdapter.setDelete(status);
                 ContactAdapter.noitfyDataSetChanged();
-
             }
         });
+
+
     }
 }
