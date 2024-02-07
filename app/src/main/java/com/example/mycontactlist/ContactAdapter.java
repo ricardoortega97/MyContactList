@@ -16,22 +16,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 public class ContactAdapter extends RecyclerView.Adapter {
-
     //private ArrayList<String> contactData; is replaced with <Contact>
-    private ArrayList<Contact> contactData;
+    private final ArrayList<Contact> contactData;
 //Sets a code behavior of the viewHolder
     private View.OnClickListener mOnItemClickerListener;
-    private static boolean isDeleting;
-    private Context parentContext;
+    private boolean isDeleting;
+    private final Context parentContext;
 
     public static void noitfyDataSetChanged() {
     }
-
-
     public class ContactViewHolder extends RecyclerView.ViewHolder {
 
         public TextView textViewContact;
-
         public TextView textPhone;
         public Button deleteButton;
         //delcare the constructor method for viewHolder
@@ -90,8 +86,7 @@ public class ContactAdapter extends RecyclerView.Adapter {
             cvh.getDeleteButton().setVisibility(View.INVISIBLE);
         }
     }
-
-    public static void setDelete(Boolean b) {
+    public void setDeleting(boolean b) {
         isDeleting = b;
     }
     private void deleteItem(int position) {
@@ -104,16 +99,16 @@ public class ContactAdapter extends RecyclerView.Adapter {
             if (didDelete) {
                 contactData.remove(position);
                 notifyDataSetChanged();
-                Toast.makeText(parentContext, "Contact Deleted", Toast.LENGTH_LONG).show();
             }
             else {
-                Toast.makeText(parentContext, "Deleted Failed!", Toast.LENGTH_LONG).show();
+                Toast.makeText(parentContext, "Delete Failed!", Toast.LENGTH_LONG).show();
             }
         }
         catch (Exception e) {
-            Toast.makeText(parentContext, "Deleted Failed!!", Toast.LENGTH_LONG).show();
+            Toast.makeText(parentContext, "Delete Failed!", Toast.LENGTH_LONG).show();
         }
     }
+
     @Override
     public int getItemCount() {
         return contactData.size();

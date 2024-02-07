@@ -162,12 +162,11 @@ public class ContactDataSource {
     public boolean deleteContact(int contactID) {
         boolean didDelete = false;
         try {
-            didDelete = database.delete("contact", "_id" + contactID, null) > 0;
+            didDelete = database.delete("contact", "_id=" + contactID, null) > 0;
         }
         catch (Exception e) {
             //do nothing
         }
         return didDelete;
     }
-
 }

@@ -1,7 +1,7 @@
 package com.example.mycontactlist;
 
+
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SwitchCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.content.Context;
@@ -18,6 +18,8 @@ import java.util.ArrayList;
 public class ContactListActivity extends AppCompatActivity {
 
    private ArrayList<Contact> contacts;
+   RecyclerView contactList;
+   ContactAdapter contactAdapter;
 
     private View.OnClickListener onItemClickListener = new View.OnClickListener() {
         @Override
@@ -36,42 +38,10 @@ public class ContactListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact_list);
         initAddContactButton();
-        initDeleteSwitch();
         intiListButton();
         intiMapButton();
         intiSettingsButton();
-    }
-    @Override
-    public void onResume() {
-        super.onResume();
-        String sortBy = getSharedPreferences("MyContactListPreferences",
-                Context.MODE_PRIVATE).getString("sortfield", "contactname");
-        String sortOrder = getSharedPreferences("MyContactListPreferences",
-                Context.MODE_PRIVATE).getString("sortOrder", "ASC");
-        //List activation
-        ContactDataSource ds = new ContactDataSource(this);
-        try {
-            ds.open();
-            contacts = ds.getContacts(sortBy, sortOrder);
-            ds.close();
-            //if there is no saved contacts in startup, then it will use intent to the mainActivity
-            if (contacts.size() > 0) {
-                RecyclerView contactList = findViewById(R.id.rvContacts);
-                //creates an instance of layoutManager to display a scrolling list
-                RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-                //message displays in the current activity
-                contactList.setLayoutManager(layoutManager);
-                ContactAdapter contactAdapter = new ContactAdapter(contacts,  ContactListActivity.this);
-                contactList.setAdapter(contactAdapter);
-            } else {
-                Intent intent = new Intent(ContactListActivity.this, MainActivity.class);
-                startActivity(intent);
-            }
-
-        }
-        catch (Exception e) {
-            Toast.makeText(this, "Error retrieving contacts ", Toast.LENGTH_LONG).show();
-        }
+        initDeleteSwitch();
     }
 
     private void intiListButton(){
@@ -119,13 +89,43 @@ public class ContactListActivity extends AppCompatActivity {
         Switch s = findViewById(R.id.switchDelete);
         s.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                boolean status = compoundButton.isChecked();
-                ContactAdapter.setDelete(status);
-                ContactAdapter.noitfyDataSetChanged();
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                boolean status = buttonView.isChecked();
+                contactAdapter.setDeleting(status);
+                contactAdapter.notifyDataSetChanged();
+
             }
         });
-
-
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        String sortBy = getSharedPreferences("MyContactListPreferences",
+                Context.MODE_PRIVATE).getString("sortfield", "contactname");
+        String sortOrder = getSharedPreferences("MyContactListPreferences",
+                Context.MODE_PRIVATE).getString("sortOrder", "ASC");
+        //List activation
+        ContactDataSource ds = new ContactDataSource(this);
+        try {
+            ds.open();
+            contacts = ds.getContacts(sortBy, sortOrder);
+            ds.close();
+            //if there is no saved contacts in startup, then it will use intent to the mainActivity
+            if (contacts.size() > 0) {
+                contactList = findViewById(R.id.rvContacts);
+                //creates an instance of layoutManager to display a scrolling list
+                RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+                //message displays in the current activity
+                contactList.setLayoutManager(layoutManager);
+                contactAdapter = new ContactAdapter(contacts,  ContactListActivity.this);
+                contactList.setAdapter(contactAdapter);
+            } else {
+                Intent intent = new Intent(ContactListActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+        }
+        catch (Exception e) {
+            Toast.makeText(this, "Error retrieving contacts ", Toast.LENGTH_LONG).show();
+        }
     }
 }
