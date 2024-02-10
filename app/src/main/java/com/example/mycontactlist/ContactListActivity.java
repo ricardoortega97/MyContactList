@@ -103,7 +103,7 @@ public class ContactListActivity extends AppCompatActivity {
         String sortBy = getSharedPreferences("MyContactListPreferences",
                 Context.MODE_PRIVATE).getString("sortfield", "contactname");
         String sortOrder = getSharedPreferences("MyContactListPreferences",
-                Context.MODE_PRIVATE).getString("sortOrder", "ASC");
+                Context.MODE_PRIVATE).getString("sortorder", "ASC");
         //List activation
         ContactDataSource ds = new ContactDataSource(this);
         try {

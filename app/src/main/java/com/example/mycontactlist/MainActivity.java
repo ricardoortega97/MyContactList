@@ -317,7 +317,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             ds.close();
         }
         catch (Exception e) {
-            Toast.makeText(this, "load Contact Failec", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "load Contact Failed", Toast.LENGTH_LONG).show();
         }
         EditText editName = findViewById(R.id.editName);
         EditText editAddress = findViewById(R.id.editAddress);
@@ -340,6 +340,5 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         birthday.setText(DateFormat.format("MM/dd/yy",
                 currentContact.getBirthday().getTimeInMillis()));
     }
-
 
 }
