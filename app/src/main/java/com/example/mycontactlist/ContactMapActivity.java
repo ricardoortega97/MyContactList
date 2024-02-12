@@ -4,38 +4,51 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
+import android.location.LocationRequest;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
-import com.google.android.material.snackbar.Snackbar;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 
-public class ContactMapActivity extends AppCompatActivity {
+public class ContactMapActivity extends AppCompatActivity  implements
+        OnMapReadyCallback {
     //variable declarations
     final int PERMISSION_REQUEST_LOCATION = 101;
-    LocationManager locationManager;
-    LocationListener gpsListenser;
-    LocationListener networkListener;
-    //holds the location object to the sets of declarations
-    Location currentBestLocation;
+    FusedLocationProviderClient fusedLocationProviderClient;
+    LocationRequest locationRequest;
+    LocationCallback locationCallback;
+    GoogleMap gmap;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact_map);
+
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+        SupportMapFragment mapFragment = (SupportMapFragment)
+                getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
+
+        createLocationRequest();
+        createLocationCallback();
         intiListButton();
         intiMapButton();
         intiSettingsButton();
-        initGetLocationButton();
+
 
     }
     private void intiListButton(){
@@ -67,140 +80,41 @@ public class ContactMapActivity extends AppCompatActivity {
             }
         });
     }
-    //Get location button method
-    private void initGetLocationButton() {
-        Button locationButton = findViewById(R.id.buttonGetLocation);
-        locationButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+    //the declaration of of bestLocation variable and is called in onLocationChanged Method
 
-                try {
-                    if (Build.VERSION.SDK_INT >= 23) {
-                        if (ContextCompat.checkSelfPermission(ContactMapActivity.this,
-                                Manifest.permission.ACCESS_FINE_LOCATION) !=
-                        PackageManager.PERMISSION_GRANTED) {
+    private void createLocationRequest() {
+        locationRequest = LocationRequest.create();
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(5000);
+        locationRequest.setPriority(LocationRequest.QUALITY_HIGH_ACCURACY);
 
-                            if (ActivityCompat.shouldShowRequestPermissionRationale(
-                                    ContactMapActivity.this,
-                                    Manifest.permission.ACCESS_FINE_LOCATION)) {
-                                /*
-                                The design project dependency did not support the gradle and caused
-                                a deplucate issue
-                                 */
-                                Snackbar.make(findViewById(R.id.activity_contact_map),
-                                                "MyContactList requires this permission to locate " +
-                                                        "your contacts", Snackbar.LENGTH_INDEFINITE)
-                                        .setAction("OK", new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-
-                                                ActivityCompat.requestPermissions(
-                                                        ContactMapActivity.this,
-                                                        new String[] {
-                                                                Manifest.permission.ACCESS_FINE_LOCATION},
-                                                        PERMISSION_REQUEST_LOCATION);
-                                            }
-                                        })
-                                        .show();
-                            } else {
-                                ActivityCompat.requestPermissions(ContactMapActivity.this, new
-                                        String[] {Manifest.permission.ACCESS_FINE_LOCATION},
-                                        PERMISSION_REQUEST_LOCATION);
-                            }
-                        } else {
-                            startLocationUpdates();
-                        }
-                    } else {
-                        startLocationUpdates();
-                    }
-                }
-                catch (Exception e) {
-                    Toast.makeText(getBaseContext(), "Error requesting permission",
-                            Toast.LENGTH_LONG).show();
-                }
-
-
-            }
-        });
     }
-
+    private void createLocationCallback() {
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+                for (Location location : locationResult.getLocations()){
+                    Toast.makeText(getBaseContext(), "Lat:" + location.getLatitude() +
+                            " Long: " + location.getLongitude() +
+                            " Accurracy: " + location.getAccuracy(),Toast.LENGTH_LONG).show();
+                }
+            }
+        };
+    }
     private void startLocationUpdates() {
         if (Build.VERSION.SDK_INT >= 23 &&
                 ContextCompat.checkSelfPermission(getBaseContext(),
-                android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                        android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ContextCompat.checkSelfPermission(getBaseContext(),
                 android.Manifest.permission.ACCESS_COARSE_LOCATION) !=
                 PackageManager.PERMISSION_GRANTED) {
+            return;
         }
-
-        try {
-            locationManager = (LocationManager)getBaseContext().getSystemService(Context.LOCATION_SERVICE);
-            gpsListenser = new LocationListener() {
-
-                public void onLocationChanged(Location location) {
-                    TextView txtLatitude = (TextView) findViewById(R.id.textLatitude);
-                    TextView txtLongitude = (TextView) findViewById(R.id.textLongitude);
-                    TextView txtAccuracy = (TextView) findViewById(R.id.textAccuracy);
-                    txtLatitude.setText(String.valueOf(location.getLatitude()));
-                    txtLongitude.setText(String.valueOf(location.getLongitude()));
-                    txtAccuracy.setText(String.valueOf(location.getAccuracy()));
-
-                    if (isBetterLocation(location)) {
-                        currentBestLocation = location;
-                        //displays in location in TextViews
-                    }
-                    //else it is ignored
-                }
-                public void onStatusChanged(String provider, int status, Bundle extras) {}
-                public void onProviderEnabled(String provider) {}
-                public void onProviderDisabled(String provider) {}
-            };
-            //added for network variable as well added a remove on the pause method
-            networkListener = new LocationListener() {
-
-                public void onLocationChanged(Location location) {
-                    TextView txtLatitude = (TextView) findViewById(R.id.textLatitude);
-                    TextView txtLongitude = (TextView) findViewById(R.id.textLongitude);
-                    TextView txtAccuracy = (TextView) findViewById(R.id.textAccuracy);
-                    txtLatitude.setText(String.valueOf(location.getLatitude()));
-                    txtLongitude.setText(String.valueOf(location.getLongitude()));
-                    txtAccuracy.setText(String.valueOf(location.getAccuracy()));
-
-                    if (isBetterLocation(location)) {
-                        currentBestLocation = location;
-                        //displays in location in TextViews
-                    }
-                    //else it is ignored
-                }
-                public void onStatusChanged(String provider, int status, Bundle extras) {}
-                public void onProviderEnabled(String provider) {}
-                public void onProviderDisabled(String provider) {}
-            };
-
-            locationManager.requestLocationUpdates(
-                    LocationManager.GPS_PROVIDER,0, 0,gpsListenser);
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0,
-                    networkListener);
-        }
-        catch (Exception e) {
-            Toast.makeText(getBaseContext(), "Error, Location not available",
-                    Toast.LENGTH_LONG).show();
-        }
-    }
-    //the declaration of of bestLocation variable and is called in onLocationChanged Method
-    private boolean isBetterLocation(Location location) {
-        boolean isbetter = false;
-        //determines if existing is true, if not then the other one is consider better
-        if (currentBestLocation == null) {
-            isbetter = true;
-            //determines if the new locations is better accuracy than the existing one
-        } else if (location.getAccuracy() <= currentBestLocation.getAccuracy()) {
-            isbetter =true;
-            //determines the time stamp is newer than the old location
-        } else if (location.getTime() - currentBestLocation.getTime() > 5 * 60 * 1000) {
-            isbetter = true;
-        }
-        return isbetter;
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
+            gmap.setMyLocationEnabled(true);
     }
 
     @Override
@@ -231,12 +145,22 @@ public class ContactMapActivity extends AppCompatActivity {
                 PackageManager.PERMISSION_GRANTED) {
         }
         try {
-            locationManager.removeUpdates(gpsListenser);
-            locationManager.removeUpdates(networkListener);
         }
         catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        gmap = googleMap;
+        gmap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
+        ActivityCompat.requestPermissions(
+                ContactMapActivity.this,
+                new String[] {
+                        Manifest.permission.ACCESS_FINE_LOCATION},
+                PERMISSION_REQUEST_LOCATION);
+
+    }
 }
