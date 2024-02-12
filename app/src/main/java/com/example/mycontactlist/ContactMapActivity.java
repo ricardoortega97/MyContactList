@@ -1,10 +1,8 @@
 package com.example.mycontactlist;
 
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
@@ -14,19 +12,22 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import com.google.android.material.snackbar.Snackbar;
 
 public class ContactMapActivity extends AppCompatActivity {
     //variable declarations
     final int PERMISSION_REQUEST_LOCATION = 101;
     LocationManager locationManager;
     LocationListener gpsListenser;
+    LocationListener networkListener;
+    //holds the location object to the sets of declarations
+    Location currentBestLocation;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,10 +83,13 @@ public class ContactMapActivity extends AppCompatActivity {
                             if (ActivityCompat.shouldShowRequestPermissionRationale(
                                     ContactMapActivity.this,
                                     Manifest.permission.ACCESS_FINE_LOCATION)) {
-
+                                /*
+                                The design project dependency did not support the gradle and caused
+                                a deplucate issue
+                                 */
                                 Snackbar.make(findViewById(R.id.activity_contact_map),
-                                        "MyContactList requires this permission to locate " +
-                                                "your contacts", Snackbar.LENGTH_INDEFINITE)
+                                                "MyContactList requires this permission to locate " +
+                                                        "your contacts", Snackbar.LENGTH_INDEFINITE)
                                         .setAction("OK", new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
@@ -119,24 +123,6 @@ public class ContactMapActivity extends AppCompatActivity {
             }
         });
     }
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (Build.VERSION.SDK_INT >= 23 &&
-                ContextCompat.checkSelfPermission(getBaseContext(),
-                        android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ContextCompat.checkSelfPermission(getBaseContext(),
-                android.Manifest.permission.ACCESS_COARSE_LOCATION) !=
-                PackageManager.PERMISSION_GRANTED) {
-        }
-        return;
-        try {
-            locationManager.removeUpdates(gpsListenser);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     private void startLocationUpdates() {
         if (Build.VERSION.SDK_INT >= 23 &&
@@ -146,7 +132,7 @@ public class ContactMapActivity extends AppCompatActivity {
                 android.Manifest.permission.ACCESS_COARSE_LOCATION) !=
                 PackageManager.PERMISSION_GRANTED) {
         }
-            return;
+
         try {
             locationManager = (LocationManager)getBaseContext().getSystemService(Context.LOCATION_SERVICE);
             gpsListenser = new LocationListener() {
@@ -158,6 +144,33 @@ public class ContactMapActivity extends AppCompatActivity {
                     txtLatitude.setText(String.valueOf(location.getLatitude()));
                     txtLongitude.setText(String.valueOf(location.getLongitude()));
                     txtAccuracy.setText(String.valueOf(location.getAccuracy()));
+
+                    if (isBetterLocation(location)) {
+                        currentBestLocation = location;
+                        //displays in location in TextViews
+                    }
+                    //else it is ignored
+                }
+                public void onStatusChanged(String provider, int status, Bundle extras) {}
+                public void onProviderEnabled(String provider) {}
+                public void onProviderDisabled(String provider) {}
+            };
+            //added for network variable as well added a remove on the pause method
+            networkListener = new LocationListener() {
+
+                public void onLocationChanged(Location location) {
+                    TextView txtLatitude = (TextView) findViewById(R.id.textLatitude);
+                    TextView txtLongitude = (TextView) findViewById(R.id.textLongitude);
+                    TextView txtAccuracy = (TextView) findViewById(R.id.textAccuracy);
+                    txtLatitude.setText(String.valueOf(location.getLatitude()));
+                    txtLongitude.setText(String.valueOf(location.getLongitude()));
+                    txtAccuracy.setText(String.valueOf(location.getAccuracy()));
+
+                    if (isBetterLocation(location)) {
+                        currentBestLocation = location;
+                        //displays in location in TextViews
+                    }
+                    //else it is ignored
                 }
                 public void onStatusChanged(String provider, int status, Bundle extras) {}
                 public void onProviderEnabled(String provider) {}
@@ -166,28 +179,63 @@ public class ContactMapActivity extends AppCompatActivity {
 
             locationManager.requestLocationUpdates(
                     LocationManager.GPS_PROVIDER,0, 0,gpsListenser);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0,
+                    networkListener);
         }
         catch (Exception e) {
             Toast.makeText(getBaseContext(), "Error, Location not available",
                     Toast.LENGTH_LONG).show();
         }
     }
-    @Override
-    public void onRequestPermissionResult(int requestCode,
-                                          String permissions[], int[] grantResults) {
+    //the declaration of of bestLocation variable and is called in onLocationChanged Method
+    private boolean isBetterLocation(Location location) {
+        boolean isbetter = false;
+        //determines if existing is true, if not then the other one is consider better
+        if (currentBestLocation == null) {
+            isbetter = true;
+            //determines if the new locations is better accuracy than the existing one
+        } else if (location.getAccuracy() <= currentBestLocation.getAccuracy()) {
+            isbetter =true;
+            //determines the time stamp is newer than the old location
+        } else if (location.getTime() - currentBestLocation.getTime() > 5 * 60 * 1000) {
+            isbetter = true;
+        }
+        return isbetter;
+    }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[],
+                                           int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case PERMISSION_REQUEST_LOCATION: {
                 if (grantResults.length > 0 &&
-                grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
+                        grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     startLocationUpdates();
                 } else {
-                    Toast.makeText(ContactMapActivity.this,
-                            "MyContactList will not locate your contacts.",
-                            Toast.LENGTH_LONG).show();
+                    Toast.makeText(ContactMapActivity.this, "MyContactList will not locate" +
+                            "your contacts.", Toast.LENGTH_LONG).show();
                 }
             }
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (Build.VERSION.SDK_INT >= 23 &&
+                ContextCompat.checkSelfPermission(getBaseContext(),
+                        android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(getBaseContext(),
+                android.Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED) {
+        }
+        try {
+            locationManager.removeUpdates(gpsListenser);
+            locationManager.removeUpdates(networkListener);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
