@@ -28,6 +28,30 @@
 
         </fragment>
 
+        <RadioGroup
+            android:id="@+id/radioGroupMapType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" >
+
+            <RadioButton
+                android:id="@+id/radioButtonNormal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Normal"
+                android:textSize="10sp" />
+
+            <RadioButton
+                android:id="@+id/radioButtonSatallite"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Satallite"
+                android:textSize="10sp" />
+        </RadioGroup>
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
