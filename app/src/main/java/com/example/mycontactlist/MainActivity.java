@@ -10,11 +10,14 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -34,6 +37,8 @@ import java.util.Calendar;
 public class MainActivity extends AppCompatActivity implements DatePickerDialog.SaveDateListener {
 
     final int PERMISSION_REQUEST_PHONE = 102;
+    final int PERMISSION_REQUEST_CAMERA = 103;
+    final int CAMERA_REQUEST = 1888;
 
     private Contact currentContact;
     @Override
@@ -56,6 +61,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         initTextChangedEvents();
         initSaveButton();
         initCallFuction();
+        initImgButton();
+
     }
     private void intiListButton(){
         ImageButton ibList = findViewById(R.id.contactsButton);
@@ -119,6 +126,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         EditText editEmail = findViewById(R.id.editEMail);
         Button buttonChange = findViewById(R.id.btnBirthday);
         Button buttonSave = findViewById(R.id.saveButton);
+        ImageButton piture = findViewById(R.id.imgContact);
 
         editName.setEnabled(enabled);
         editAddress.setEnabled(enabled);
@@ -130,13 +138,36 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         editEmail.setEnabled(enabled);
         buttonChange.setEnabled(enabled);
         buttonSave.setEnabled(enabled);
+        piture.setEnabled(enabled);
         //When user saves data, this will focus the screen to the top when clicked saved
         if (enabled){
             editName.requestFocus();
+            editPhone.setInputType(InputType.TYPE_CLASS_PHONE);
+            editCell.setInputType(InputType.TYPE_CLASS_PHONE);
         }
         else{
-            ScrollView s = findViewById(R.id.scrollViiew);
+            ScrollView s = findViewById(R.id.scrollView);
             s.fullScroll(ScrollView.FOCUS_UP);
+            editPhone.setInputType(InputType.TYPE_NULL);
+            editCell.setInputType(InputType.TYPE_NULL);
+        }
+    }
+    //take photo method
+    public void takePhoto(){
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(cameraIntent, CAMERA_REQUEST);
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == CAMERA_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                Bitmap photo = (Bitmap) data.getExtras().get("data");
+                Bitmap scalePhoto = Bitmap.createScaledBitmap(photo, 144, 144, true);
+                ImageButton imgContact = (ImageButton) findViewById(R.id.imgContact);
+                imgContact.setImageBitmap(scalePhoto);
+                currentContact.setPicture(scalePhoto);
+            }
         }
     }
 
@@ -204,6 +235,15 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                                     + "from this app", Toast.LENGTH_LONG).show();
                 }
             }
+            case PERMISSION_REQUEST_CAMERA: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    takePhoto();
+                } else {
+                    Toast.makeText(MainActivity.this, "You will not be able to save" +
+                            "contact pitures from this app", Toast.LENGTH_LONG).show();
+                }
+                return;
+            }
         }
     }
 private void callContact(String phoneNumber) {
@@ -218,6 +258,40 @@ private void callContact(String phoneNumber) {
         startActivity(intent);
     }
 }
+//Contact Img method
+    private void initImgButton() {
+        ImageButton ib = findViewById(R.id.imgContact);
+        ib.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (Build.VERSION.SDK_INT >= 23 ) {
+                    if (ContextCompat.checkSelfPermission(MainActivity.this,
+                            Manifest.permission.CAMERA) !=
+                    PackageManager.PERMISSION_GRANTED) {
+                        if (ActivityCompat.shouldShowRequestPermissionRationale(
+                                MainActivity.this, Manifest.permission.CAMERA)) {
+                            Snackbar.make(findViewById(R.id.activity_main),
+                                    "The app needs permission to take pituures.",
+                                    Snackbar.LENGTH_INDEFINITE).setAction("OK",
+                                    new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            ActivityCompat.requestPermissions(
+                                                    MainActivity.this,new String[] {
+                                                            Manifest.permission.CAMERA},
+                                            PERMISSION_REQUEST_CAMERA);
+                                        }
+                                    }).show();
+                        } else {
+                            takePhoto();
+                        }
+                    } else {
+                        takePhoto();
+                    }
+                }
+            }
+        });
+    }
 
     @Override
     public void didFinishDatePickerDialog(Calendar selectedTime) {
@@ -431,6 +505,13 @@ private void callContact(String phoneNumber) {
         EditText editCell = findViewById(R.id.editCell);
         EditText editEmail = findViewById(R.id.editEMail);
         TextView birthday = findViewById(R.id.textBirthday);
+        ImageButton picture = findViewById(R.id.imgContact);
+        if (currentContact.getPicture() != null){
+            picture.setImageBitmap(currentContact.getPicture());
+        }
+        else {
+            picture.setImageResource(R.drawable.photoicon);
+        }
 
         editName.setText(currentContact.getContactName());
         editAddress.setText(currentContact.getStreetAddress());
