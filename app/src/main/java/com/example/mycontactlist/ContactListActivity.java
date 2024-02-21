@@ -108,13 +108,18 @@ public class ContactListActivity extends AppCompatActivity {
         s.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                boolean status = buttonView.isChecked();
-                contactAdapter.setDeleting(status);
-                contactAdapter.notifyDataSetChanged();
-
+                // Ensure contactAdapter is not null before calling setDeleting
+                if (contactAdapter != null) {
+                    boolean status = buttonView.isChecked();
+                    contactAdapter.setDeleting(status);
+                    contactAdapter.notifyDataSetChanged();
+                } else {
+                    // Handle the case where contactAdapter is null (log an error, initialize it, etc.)
+                }
             }
         });
     }
+
     @Override
     public void onResume() {
         super.onResume();

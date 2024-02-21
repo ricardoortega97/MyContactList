@@ -52,7 +52,6 @@ public class ContactMapActivity extends AppCompatActivity  implements
     FusedLocationProviderClient fusedLocationProviderClient;
     LocationRequest locationRequest;
     LocationCallback locationCallback;
-
     ArrayList<Contact> contacts = new ArrayList<>();
     Contact currentContact = null;
     GoogleMap gmap;
@@ -93,6 +92,7 @@ public class ContactMapActivity extends AppCompatActivity  implements
 
         createLocationRequest();
         createLocationCallback();
+        stopLocationUpdates();
         intiListButton();
         intiMapButton();
         intiSettingsButton();
@@ -148,42 +148,44 @@ public class ContactMapActivity extends AppCompatActivity  implements
             float[] accelerometerValues;
             float[] magneticValues;
         }
-        public void onSensorChanged(SensorEvent event){
+        public void onSensorChanged(SensorEvent event) {
             float[] accelerometerValues = new float[0];
-            if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
+            if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
                 accelerometerValues = event.values;
             float[] magneticValues = new float[0];
             if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
                 magneticValues = event.values;
-            if (accelerometerValues != null && magneticValues != null){
-                float R[] = new float[9];
-                float I[] = new float[9];
+            float R[] = new float[9];
+            float I[] = new float[9];
 
+            float orientation[] = new float[3];
+
+            if (accelerometerValues != null && magneticValues != null &&
+                    accelerometerValues.length >= 3 && magneticValues.length >= 3) {
                 boolean success = SensorManager.getRotationMatrix(R, I,
-                        accelerometerValues,magneticValues);
-
+                        accelerometerValues, magneticValues);
                 if (success) {
-                    float orientational[] = new float[3];
-                    SensorManager.getOrientation(R, orientational);
+                    SensorManager.getOrientation(R, orientation);
 
-                    float azimut = (float) Math.toDegrees(orientational[0]);
+                    float azimut = (float) Math.toDegrees(orientation[0]);
                     if (azimut < 0.0f) {
-                        azimut+=360.0f;
+                        azimut += 360.0f;
                     }
                     String direction;
-                        if (azimut >= 315 || azimut < 45 ) {
-                            direction = "N";}
-                        else if (azimut >= 225 && azimut < 315) {
-                            direction = "W";}
-                        else if (azimut >= 135 && azimut < 225) {
-                            direction = "S";}
-                        else {
-                            direction = "E";
-                        }
+                    if (azimut >= 315 || azimut < 45) {
+                        direction = "N";
+                    } else if (azimut >= 225 && azimut < 315) {
+                        direction = "W";
+                    } else if (azimut >= 135 && azimut < 225) {
+                        direction = "S";
+                    } else {
+                        direction = "E";
+                    }
                     textDirection.setText(direction);
-
                 }
             }
+
+
         }
     };
 
@@ -210,9 +212,8 @@ public class ContactMapActivity extends AppCompatActivity  implements
         };
     }
     private void startLocationUpdates() {
-        if (Build.VERSION.SDK_INT >= 23 &&
-                ContextCompat.checkSelfPermission(getBaseContext(),
-                        android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+        if (Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(getBaseContext(),
+                android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ContextCompat.checkSelfPermission(getBaseContext(),
                 android.Manifest.permission.ACCESS_COARSE_LOCATION) !=
                 PackageManager.PERMISSION_GRANTED) {
@@ -222,23 +223,17 @@ public class ContactMapActivity extends AppCompatActivity  implements
         gmap.setMyLocationEnabled(true);
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[],
-                                           int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case PERMISSION_REQUEST_LOCATION: {
-                if (grantResults.length > 0 &&
-                        grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    startLocationUpdates();
-                } else {
-                    Toast.makeText(ContactMapActivity.this, "MyContactList will not locate" +
-                            "your contacts.", Toast.LENGTH_LONG).show();
-                }
-            }
+    private void stopLocationUpdates() {
+        if (Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(getBaseContext(),
+                android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(getBaseContext(),
+                android.Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED) {
+            return;
         }
-    }
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
 
+    }
     @Override
     public void onMapReady(GoogleMap googleMap) {
         RadioButton rbNormal = findViewById(R.id.radioButtonNormal);
@@ -323,6 +318,23 @@ public class ContactMapActivity extends AppCompatActivity  implements
                 new String[] {
                     Manifest.permission.ACCESS_FINE_LOCATION},
                 PERMISSION_REQUEST_LOCATION);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[],
+                                           int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case PERMISSION_REQUEST_LOCATION: {
+                if (grantResults.length > 0 &&
+                        grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    startLocationUpdates();
+                } else {
+                    Toast.makeText(ContactMapActivity.this, "MyContactList will not locate" +
+                            "your contacts.", Toast.LENGTH_LONG).show();
+                }
+            }
+        }
     }
 
     private void initMapTypeButtons() {
