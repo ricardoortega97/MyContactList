@@ -144,15 +144,16 @@ public class ContactMapActivity extends AppCompatActivity  implements
 
     //Sensor method
     private SensorEventListener mySensorEventListener = new SensorEventListener() {
+        @Override
         public void onAccuracyChanged(Sensor sensor, int accuracy){
-            float[] accelerometerValues;
-            float[] magneticValues;
+
         }
+        float[] accelerometerValues;
+        float[] magneticValues;
+        @Override
         public void onSensorChanged(SensorEvent event) {
-            float[] accelerometerValues = new float[0];
             if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
                 accelerometerValues = event.values;
-            float[] magneticValues = new float[0];
             if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
                 magneticValues = event.values;
             float R[] = new float[9];

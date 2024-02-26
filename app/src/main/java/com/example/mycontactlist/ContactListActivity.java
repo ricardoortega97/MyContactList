@@ -26,7 +26,7 @@ public class ContactListActivity extends AppCompatActivity {
    RecyclerView contactList;
    ContactAdapter contactAdapter;
 
-    private View.OnClickListener onItemClickListener = new View.OnClickListener() {
+    private final View.OnClickListener onItemClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             RecyclerView.ViewHolder viewHolder = (RecyclerView.ViewHolder) v.getTag();
@@ -54,12 +54,33 @@ public class ContactListActivity extends AppCompatActivity {
                 double batteryLv = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
                 double lvScale = intent.getIntExtra(BatteryManager.EXTRA_SCALE,0);
                 int batteryPercent = (int) Math.floor(batteryLv / lvScale * 100 );
-                TextView textBatteryState = (TextView) findViewById(R.id.textBatteryLv);
+                TextView textBatteryState = findViewById(R.id.textBatteryLv);
                 textBatteryState.setText(batteryPercent + "%");
             }
         };
         IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         registerReceiver(batteryReceiver, filter);
+
+        String sortBy = getSharedPreferences("MyContactListPreferences",
+                Context.MODE_PRIVATE).getString("sortfield", "contactname");
+        String sortOrder = getSharedPreferences("MyContactListPreferences",
+                Context.MODE_PRIVATE).getString("sortorder", "ASC");
+        ContactDataSource ds = new ContactDataSource(this);
+
+        try{
+            ds.open();
+            contacts = ds.getContacts(sortBy, sortOrder);
+            ds.close();
+            contactList = findViewById(R.id.rvContacts);
+            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+            contactList.setLayoutManager(layoutManager);
+            contactAdapter = new ContactAdapter(contacts, ContactListActivity.this);
+            contactAdapter.setOnItemClickerListener(onItemClickListener);
+            contactList.setAdapter(contactAdapter);
+        }
+        catch(Exception e){
+            Toast.makeText(this,"Error retrieving contacts", Toast.LENGTH_LONG).show();
+        }
     }
 
     private void intiListButton(){
@@ -141,6 +162,7 @@ public class ContactListActivity extends AppCompatActivity {
                 //message displays in the current activity
                 contactList.setLayoutManager(layoutManager);
                 contactAdapter = new ContactAdapter(contacts,  ContactListActivity.this);
+                contactAdapter.setOnItemClickerListener(onItemClickListener);
                 contactList.setAdapter(contactAdapter);
             } else {
                 Intent intent = new Intent(ContactListActivity.this, MainActivity.class);

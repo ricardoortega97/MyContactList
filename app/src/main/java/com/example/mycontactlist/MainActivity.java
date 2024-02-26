@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         intiToggleButton();
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            initContact(extras.getInt("contactid"));
+            initContact(extras.getInt("contactID"));
         }
         else {
             currentContact = new Contact();
@@ -160,11 +160,11 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == CAMERA_REQUEST) {
+        if (requestCode == CAMERA_REQUEST) {
             if (resultCode == RESULT_OK) {
                 Bitmap photo = (Bitmap) data.getExtras().get("data");
                 Bitmap scalePhoto = Bitmap.createScaledBitmap(photo, 144, 144, true);
-                ImageButton imgContact = (ImageButton) findViewById(R.id.imgContact);
+                ImageButton imgContact = findViewById(R.id.imgContact);
                 imgContact.setImageBitmap(scalePhoto);
                 currentContact.setPicture(scalePhoto);
             }

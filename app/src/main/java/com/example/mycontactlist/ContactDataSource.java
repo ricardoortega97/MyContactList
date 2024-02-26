@@ -90,7 +90,7 @@ public class ContactDataSource {
     }
 
     public int getLastContactID(){
-        int lastID;
+        int lastID = 1;
         try {
             String query = "Select MAX(_id) from contact";
             Cursor cursor = database.rawQuery(query, null);
